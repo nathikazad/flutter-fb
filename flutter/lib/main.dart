@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'dart:io' show Platform;
 
 void main() {
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -54,7 +54,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  FirebaseDatabase fdb;
+  // FirebaseDatabase? fdb;
   @override
   void initState() {
     super.initState();
@@ -66,22 +66,22 @@ class _MyHomePageState extends State<MyHomePage> {
     print("init");
     FirebaseApp app = await Firebase.initializeApp();
     // String host = Platform.isAndroid ? '10.0.2.2:9099' : 'localhost:9099';
-    fdb = FirebaseDatabase(
-        app: app,
-        databaseURL:
-            'http://localhost:9000/?ns=flutter-test-5df78-default-rtdb');
+    // fdb = FirebaseDatabase(
+    //     app: app,
+    //     databaseURL:
+    //         'http://localhost:9000/?ns=flutter-test-5df78-default-rtdb');
     await FirebaseAuth.instance.useEmulator('http://localhost:9099');
     FirebaseFunctions.instance
         .useFunctionsEmulator(origin: 'http://localhost:5001');
     // fdb.reference().child('/').onValue.forEach((element) {
     //   print('new element: $element');
     // });
-    fdb.reference().child('/').set("hello");
+    // fdb.reference().child('/').set("hello");
     // HttpsCallable callable =
     //     FirebaseFunctions.instance.httpsCallable('listFruit');
     // final results = await callable();
     // print(results.data);
-    FirebaseAuth.instance.idTokenChanges().listen((User user) {
+    FirebaseAuth.instance.idTokenChanges().listen((User? user) {
       if (user == null) {
         print('User is currently signed out!');
       } else {
@@ -111,13 +111,16 @@ class _MyHomePageState extends State<MyHomePage> {
           } else if (e.code == 'wrong-password') {
             print('Wrong password provided for that user.');
           }
+          rethrow;
         }
       } else {
         print(e);
       }
+      rethrow;
     } catch (e) {
       print('sign in error');
       print(e);
+      rethrow;
     }
   }
 
@@ -129,10 +132,10 @@ class _MyHomePageState extends State<MyHomePage> {
         .child('/')
         .set("hell");
     // .onError((error, stackTrace) => print("db write error"));
-    // HttpsCallable callable =
-    //     FirebaseFunctions.instance.httpsCallable('listUser');
-    // final results = await callable();
-    // print(results.data);
+    HttpsCallable callable =
+        FirebaseFunctions.instance.httpsCallable('listUser');
+    final results = await callable();
+    print(results.data);
   }
 
   @override
