@@ -26,6 +26,7 @@ dependencies:
   firebase_core: any
   firebase_auth: any
   cloud_functions: any
+  firebase_database: any
   flutter_facebook_auth: any
   js: any
 

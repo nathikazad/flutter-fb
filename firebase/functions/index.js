@@ -8,7 +8,11 @@ const functions = require("firebase-functions");
 //   response.send("Hello from Firebase!");
 // });
 
-exports.listFruit = functions.https.onCall((data, context) => {
+exports.listUser = functions.https.onCall((data, context) => {
     console.log(context.auth)
-    return ["Apple", "Banana", "Cherry", "Date", "Fig", "Grapes"]
+    if(context.auth){
+      return context.auth.uid
+    } else {
+      return "unauthenticated"
+    }
   });

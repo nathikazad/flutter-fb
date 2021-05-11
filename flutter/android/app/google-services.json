@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "68415162069",
+    "firebase_url": "https://flutter-test-5df78-default-rtdb.firebaseio.com",
     "project_id": "flutter-test-5df78",
     "storage_bucket": "flutter-test-5df78.appspot.com"
   },
@@ -29,6 +30,13 @@
             {
               "client_id": "68415162069-2qkscdmdt0pjvqn1i1lkeecsi0ss4ur2.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "68415162069-csbfu8lsk54nainfbqf38e6mcj1g2lme.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterApp"
+              }
             }
           ]
         }

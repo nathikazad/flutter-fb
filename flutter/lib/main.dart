@@ -2,8 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'dart:io' show Platform;
+
 void main() {
   runApp(MyApp());
 }
@@ -52,9 +54,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
+  FirebaseDatabase fdb;
   @override
-  void initState(){
+  void initState() {
     super.initState();
     print("init");
     asyncMethod();
@@ -62,16 +64,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void asyncMethod() async {
     print("init");
-    await Firebase.initializeApp();
+    FirebaseApp app = await Firebase.initializeApp();
     // String host = Platform.isAndroid ? '10.0.2.2:9099' : 'localhost:9099';
+    fdb = FirebaseDatabase(
+        app: app,
+        databaseURL:
+            'http://localhost:9000/?ns=flutter-test-5df78-default-rtdb');
     await FirebaseAuth.instance.useEmulator('http://localhost:9099');
-    FirebaseFunctions.instance.useFunctionsEmulator(origin: 'http://localhost:5001');
-    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('listFruit');
-    final results = await callable();
-    print(results.data);
-    FirebaseAuth.instance
-        .idTokenChanges()
-        .listen((User user) {
+    FirebaseFunctions.instance
+        .useFunctionsEmulator(origin: 'http://localhost:5001');
+    // fdb.reference().child('/').onValue.forEach((element) {
+    //   print('new element: $element');
+    // });
+    fdb.reference().child('/').set("hello");
+    // HttpsCallable callable =
+    //     FirebaseFunctions.instance.httpsCallable('listFruit');
+    // final results = await callable();
+    // print(results.data);
+    FirebaseAuth.instance.idTokenChanges().listen((User user) {
       if (user == null) {
         print('User is currently signed out!');
       } else {
@@ -81,15 +91,10 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-
-
   Future<UserCredential> signIn(email, password) async {
     try {
-
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       return userCredential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -97,10 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
       } else if (e.code == 'email-already-in-use') {
         print('The account already exists for that email.');
         try {
-          UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-              email: email,
-              password: password
-          );
+          UserCredential userCredential = await FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: email, password: password);
           return userCredential;
         } on FirebaseAuthException catch (e) {
           if (e.code == 'user-not-found') {
@@ -109,16 +112,27 @@ class _MyHomePageState extends State<MyHomePage> {
             print('Wrong password provided for that user.');
           }
         }
+      } else {
+        print(e);
       }
     } catch (e) {
+      print('sign in error');
       print(e);
     }
   }
 
   void callCloudFunction() async {
-    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('listFruit');
-    final results = await callable();
-    print(results.data);
+    await FirebaseDatabase(
+            databaseURL:
+                'http://10.0.2.2:9000/?ns=flutter-test-5df78-default-rtdb')
+        .reference()
+        .child('/')
+        .set("hell");
+    // .onError((error, stackTrace) => print("db write error"));
+    // HttpsCallable callable =
+    //     FirebaseFunctions.instance.httpsCallable('listUser');
+    // final results = await callable();
+    // print(results.data);
   }
 
   @override
@@ -181,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          signIn("barry.allen@example.com", "SuperSecretPassword!");
+          signIn("barry.allenn@example.com", "SuperSecretPassword!");
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
